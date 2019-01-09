@@ -1,0 +1,36 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion _android.compileSdkVersion
+    buildToolsVersion _android.buildToolsVersion
+
+    defaultConfig {
+        applicationId _android.applicationId
+
+        minSdkVersion _android.minSdkVersion
+        targetSdkVersion _android.targetSdkVersion
+        versionCode _android.versionCode
+        versionName _android.versionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    api fileTree(dir: 'libs', include: ['*.jar'])
+
+    // rxjava
+    api rx.rxjava2
+    api rx.rxandroid2
+}

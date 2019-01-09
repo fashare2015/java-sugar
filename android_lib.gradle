@@ -1,0 +1,46 @@
+apply plugin: 'com.android.library'
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion _android.compileSdkVersion
+    buildToolsVersion _android.buildToolsVersion
+
+    defaultConfig {
+//        applicationId _android.applicationId
+
+        minSdkVersion _android.minSdkVersion
+        targetSdkVersion _android.targetSdkVersion
+        versionCode _android.versionCode
+        versionName _android.versionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+}
+
+dependencies {
+    api fileTree(dir: 'libs', include: ['*.jar'])
+
+    // kotlin
+    compile _kotlin.kotlin_stdlib
+
+    // rxjava
+    api rx.rxjava2
+    api rx.rxandroid2
+}

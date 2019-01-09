@@ -1,0 +1,10 @@
+apply from: '../../java_lib.gradle'
+
+dependencies {
+    // AutoService: 由 google 开发,
+    // 用于生成 META-INF/services/javax.annotation.processing.Processor
+    compile 'com.google.auto.service:auto-service:1.0-rc2'
+
+    // java 代码生成器: java-1.7, 由 square 开发
+    compile 'com.squareup:javapoet:1.7.0'
+}
