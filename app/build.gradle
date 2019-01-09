@@ -13,4 +13,7 @@ dependencies {
     api support.recyclerview
     api support.design
     api support.cardview
+
+    api project(":libs:apt")
+    annotationProcessor project(":libs:apt")
 }
