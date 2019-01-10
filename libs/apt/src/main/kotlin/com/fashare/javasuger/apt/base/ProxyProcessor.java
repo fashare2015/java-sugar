@@ -1,23 +1,23 @@
-package com.fashare.javasuger.apt;
-
-
-import com.google.auto.service.AutoService;
+package com.fashare.javasuger.apt.base;
 
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 
 /**
- * 由于 @AutoService 不支持 kotlin, 加一层代理
+ * Created by apple on 2019/1/10.
+ * 代理类
  */
-@AutoService(Processor.class)
-public class MainProcesser extends AbstractProcessor {
-    private AbstractProcessor mRealProcessor = new MainProcesserImpl();
+public class ProxyProcessor extends AbstractProcessor {
+    private AbstractProcessor mRealProcessor;
+
+    public ProxyProcessor(AbstractProcessor realProcessor) {
+        mRealProcessor = realProcessor;
+    }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
