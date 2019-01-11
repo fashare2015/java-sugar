@@ -1,6 +1,6 @@
 package com.fashare.javasuger.apt
 
-import com.fashare.javasuger.annotation.Singleton
+import com.fashare.javasuger.annotation.Subject
 import com.fashare.javasuger.apt.base.BaseProcessor
 import com.fashare.javasuger.apt.util.logd
 import com.sun.tools.javac.code.Flags
@@ -13,22 +13,23 @@ import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Name
 import javax.lang.model.element.TypeElement
 
-internal class SingletonProcessorImpl : BaseProcessor() {
+internal class SubjectProcessorImpl : BaseProcessor() {
 
     override fun getSupportedAnnotationTypes(): Set<String> {
-        return setOf(Singleton::class.java.canonicalName)
+        return setOf(Subject::class.java.canonicalName)
     }
 
     override fun process(set: Set<TypeElement>, roundEnvironment: RoundEnvironment): Boolean {
         logd("process begin !!! set = $set")
 
-        roundEnvironment.getElementsAnnotatedWith(Singleton::class.java)
+        roundEnvironment.getElementsAnnotatedWith(Subject::class.java)
                 .filter { it is TypeElement }
                 .map { it as TypeElement }
                 .forEach {
-                    logd("process find class = $it")
-
-                    val tree = trees.getTree(it) as JCTree
+//                    val tree = trees.getTree(it) as JCTree
+                    val treePath = trees.getPath(it)
+                    val tree = treePath.compilationUnit as JCTree
+                    logd("process find class = $it, jcTree = ${tree.javaClass.simpleName}")
                     tree.accept(MyTreeTranslator(it.simpleName))
                 }
 
@@ -38,23 +39,32 @@ internal class SingletonProcessorImpl : BaseProcessor() {
 
     inner class MyTreeTranslator(val rootClazzName: Name) : TreeTranslator() {
 
+        override fun visitTopLevel(cu: JCTree.JCCompilationUnit) {
+            logd("visitTopLevel: ")
+            cu.imports.forEach {
+                logd("visitTopLevel: import $it, ${it.qualid?.javaClass?.simpleName}")
+            }
+            cu.defs = cu.defs.prepend(
+                    treeMaker.Import(treeMaker.Select(treeMaker.Ident(names.fromString("java.util")), names.fromString("*")), false))
+            super.visitTopLevel(cu)
+        }
+
         override fun visitClassDef(jcClassDecl: JCClassDecl) {
             val jcClassName = jcClassDecl.name.toString()
             logd("visitClassDef: class name = $jcClassName, rootClazzName = $rootClazzName")
-            if (jcClassDecl.name.equals(rootClazzName)) {     // 防止重复访问生成的 _InstanceHolder
+            if (jcClassDecl.name.equals(rootClazzName)) {
                 jcClassDecl.defs = jcClassDecl.defs
-                        .prepend(makeGetInstanceMethodDecl(jcClassDecl))
-                        .prepend(makeInstanceHolderDecl(jcClassDecl))
+                        .prepend(makeObserversFieldDecl(jcClassDecl))
             }
             super.visitClassDef(jcClassDecl)
         }
 
-        private fun makeInstanceFieldDecl(jcClassDecl: JCClassDecl): JCTree {
+        private fun makeObserversFieldDecl(jcClassDecl: JCClassDecl): JCTree {
             return treeMaker.VarDef(
-                    treeMaker.Modifiers(Flags.PRIVATE.toLong() or Flags.STATIC.toLong() or Flags.FINAL.toLong()),
-                    names.fromString("_sInstance"),
-                    treeMaker.Ident(jcClassDecl.name),
-                    treeMaker.NewClass(null, List.nil(), treeMaker.Ident(jcClassDecl.name), List.nil(), null))
+                    treeMaker.Modifiers(Flags.PUBLIC.toLong()),
+                    names.fromString("_mObserverList"),
+                    treeMaker.Ident(names.fromString("String")),
+                    treeMaker.NewClass(null, List.nil(), treeMaker.Ident(names.fromString("String")), List.nil(), null))
         }
 
         private fun makeGetInstanceMethodDecl(jcClassDecl: JCClassDecl): JCTree {
@@ -70,7 +80,7 @@ internal class SingletonProcessorImpl : BaseProcessor() {
 
         private fun makeInstanceHolderDecl(jcClassDecl: JCClassDecl): JCTree {
             val defs = List.of(
-                    makeInstanceFieldDecl(jcClassDecl)
+                    makeObserversFieldDecl(jcClassDecl)
             )
 
             return treeMaker.ClassDef(
