@@ -1,10 +1,14 @@
 package com.fashare.javasuger;
 
-import com.fashare.javasuger.annotation.Getter;
+import android.content.Context;
+import android.widget.Toast;
+
 import com.fashare.javasuger.annotation.Singleton;
 
-@Getter
 @Singleton
 public class UserManager {
-    private User user = new User();
+
+    public void sayHello(Context context) {
+        Toast.makeText(context, "hello @Singleton", Toast.LENGTH_LONG).show();
+    }
 }

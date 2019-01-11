@@ -34,37 +34,48 @@ internal class SingletonProcessorImpl : BaseProcessor() {
         logd("process end !!!")
         return true
     }
-    
+
     inner class MyTreeTranslator : TreeTranslator() {
+
         override fun visitClassDef(jcClassDecl: JCClassDecl) {
-//            jcClassDecl.defs
-//                    .filter { it.kind == Tree.Kind.VARIABLE }
-//                    .map { it as JCTree.JCVariableDecl }
-//                    .forEach {
-                        jcClassDecl.defs = jcClassDecl.defs
-                                .prepend(makeInstanceFieldDecl(jcClassDecl))
-                                .prepend(makeGetInstanceMethodDecl(jcClassDecl))
-//                    }
+            val jcClassName = jcClassDecl.name.toString()
+            logd("visitClassDef: class name = $jcClassName")
+            if (jcClassName != "_InstanceHolder") {     // 防止重复访问生成的 _InstanceHolder
+                jcClassDecl.defs = jcClassDecl.defs
+                        .prepend(makeGetInstanceMethodDecl(jcClassDecl))
+                        .prepend(makeInstanceHolderDecl(jcClassDecl))
+            }
             super.visitClassDef(jcClassDecl)
         }
 
         private fun makeInstanceFieldDecl(jcClassDecl: JCClassDecl): JCTree {
             return treeMaker.VarDef(
-                    treeMaker.Modifiers(Flags.PRIVATE.toLong() or Flags.STATIC.toLong()),
+                    treeMaker.Modifiers(Flags.PRIVATE.toLong() or Flags.STATIC.toLong() or Flags.FINAL.toLong()),
                     names.fromString("_sInstance"),
                     treeMaker.Ident(jcClassDecl.name),
-                    null)
+                    treeMaker.NewClass(null, List.nil(), treeMaker.Ident(jcClassDecl.name), List.nil(), null))
         }
 
         private fun makeGetInstanceMethodDecl(jcClassDecl: JCClassDecl): JCTree {
             val statements = ListBuffer<JCTree.JCStatement>()
-            statements.append(treeMaker.Return(treeMaker.NewClass(null, List.nil(), treeMaker.Ident(jcClassDecl.name), List.nil(), null)))
+            statements.append(treeMaker.Return(treeMaker.Select(treeMaker.Ident(names.fromString("_InstanceHolder")), names.fromString("_sInstance"))))
             val body = treeMaker.Block(0, statements.toList())
             return treeMaker.MethodDef(
                     treeMaker.Modifiers(Flags.PUBLIC.toLong() or Flags.STATIC.toLong()),
                     names.fromString("getInstance"),
                     treeMaker.Ident(jcClassDecl.name),
                     List.nil(), List.nil(), List.nil(), body, null)
+        }
+
+        private fun makeInstanceHolderDecl(jcClassDecl: JCClassDecl): JCTree {
+            val defs = List.of(
+                    makeInstanceFieldDecl(jcClassDecl)
+            )
+
+            return treeMaker.ClassDef(
+                    treeMaker.Modifiers(Flags.PRIVATE.toLong() or Flags.STATIC.toLong()),
+                    names.fromString("_InstanceHolder"),
+                    List.nil(), null, List.nil(), defs)
         }
     }
 }
