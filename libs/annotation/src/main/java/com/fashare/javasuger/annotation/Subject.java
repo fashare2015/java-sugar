@@ -16,11 +16,12 @@ public @interface Subject {
     /**
      * 类似 aidl 里的 Stub
      */
-    public interface Stub<T> {
-        void add(T observer);
+    interface Stub {
+//        void add();
+        void add(Object observer);
 
-        void remove(T observer);
+        void remove(Object observer);
 
-        void notifyObservers(Object event);
+        void notify(Object event);
     }
 }

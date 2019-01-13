@@ -1,14 +1,37 @@
 package com.fashare.javasuger;
 
-
-import com.fashare.javasuger.annotation.Singleton;
 import com.fashare.javasuger.annotation.Subject;
 
-//@AstPrint
-@Singleton
+
 @Subject
-public class MyEventBus {
+//@Singleton
+public abstract class MyEventBus implements Subject.Stub {
     public interface Listener {
-        void onEvent(String event);
+        void onEvent(Object event);
     }
+
+    public static MyEventBus getInstance() {
+        try {
+            return MyEventBus.class.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+//    private Set mList = new HashSet();
+//
+//    public void setA(Object aa){
+//        this.mList.add(aa);
+//    }
+
+//    List list = new ArrayList();
+//
+//    private void a() {
+//        for (Object item : list) {
+//            ((Listener) item).onEvent("AAA");
+//        }
+//    }
 }
