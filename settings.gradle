@@ -1,1 +1,1 @@
-include ':app', ':libs:apt', ':libs:annotation', ':demos:test-java'
+include ':libs:apt', ':libs:annotation', ':demos:test-java'
