@@ -29,14 +29,11 @@ internal class SingletonProcessorImpl : SingleAnnotationProcessor() {
             super.visitClassDef(jcClassDecl)
         }
 
-        private fun makeInstanceFieldDecl(jcClassDecl: JCClassDecl): JCTree {
-            return treeMaker.VarDef(
-                    treeMaker.Modifiers(Flags.PRIVATE.toLong() or Flags.STATIC.toLong() or Flags.FINAL.toLong()),
-                    names.fromString("_sInstance"),
-                    treeMaker.Ident(jcClassDecl.name),
-                    treeMaker.NewClass(null, List.nil(), treeMaker.Ident(jcClassDecl.name), List.nil(), null))
-        }
-
+        /**
+            public static UserManager getInstance() {
+                return UserManager._InstanceHolder._sInstance;
+            }
+         */
         private fun makeGetInstanceMethodDecl(jcClassDecl: JCClassDecl): JCTree {
             val body = ListBuffer<JCTree.JCStatement>()
                     .append(treeMaker.Return(treeMaker.Select(treeMaker.Ident(names.fromString("_InstanceHolder")), names.fromString("_sInstance"))))
@@ -50,12 +47,28 @@ internal class SingletonProcessorImpl : SingleAnnotationProcessor() {
                     List.nil(), List.nil(), List.nil(), body, null)
         }
 
+        /**
+            private static class _InstanceHolder {
+                private static final UserManager _sInstance = new UserManager();
+            }
+         */
         private fun makeInstanceHolderDecl(jcClassDecl: JCClassDecl): JCTree {
             return treeMaker.ClassDef(
                     treeMaker.Modifiers(Flags.PRIVATE.toLong() or Flags.STATIC.toLong()),
                     names.fromString("_InstanceHolder"),
                     List.nil(), null, List.nil(),
                     List.of(makeInstanceFieldDecl(jcClassDecl)))
+        }
+
+        /**
+         * private static final UserManager _sInstance = new UserManager();
+         */
+        private fun makeInstanceFieldDecl(jcClassDecl: JCClassDecl): JCTree {
+            return treeMaker.VarDef(
+                    treeMaker.Modifiers(Flags.PRIVATE.toLong() or Flags.STATIC.toLong() or Flags.FINAL.toLong()),
+                    names.fromString("_sInstance"),
+                    treeMaker.Ident(jcClassDecl.name),
+                    treeMaker.NewClass(null, List.nil(), treeMaker.Ident(jcClassDecl.name), List.nil(), null))
         }
     }
 }

@@ -36,6 +36,12 @@ internal class SetterProcessorImpl : SingleAnnotationProcessor() {
             super.visitClassDef(jcClassDecl)
         }
 
+        /**
+            public User setName(String name) {
+                this.name = name;
+                return this;
+            }
+         */
         private fun makeSetterMethodDecl(jcVariableDecl: JCVariableDecl, jcClassDecl: JCClassDecl): JCTree {
             val body = ListBuffer<JCStatement>()
                     .append(treeMaker.Exec(treeMaker.Assign(
@@ -68,6 +74,9 @@ internal class SetterProcessorImpl : SingleAnnotationProcessor() {
                     body, null)
         }
 
+        /**
+         * setName
+         */
         private fun getNewMethodName(name: Name): Name {
             val str = name.toString()
             if (str.isNotEmpty()) {

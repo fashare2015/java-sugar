@@ -33,6 +33,11 @@ internal class GetterProcessorImpl : SingleAnnotationProcessor() {
             super.visitClassDef(jcClassDecl)
         }
 
+        /**
+            public String getName() {
+                return this.name;
+            }
+         */
         private fun makeGetterMethodDecl(jcVariableDecl: JCVariableDecl): JCTree {
             val body = ListBuffer<JCStatement>()
                     .append(treeMaker.Return(treeMaker.Select(treeMaker.Ident(names._this), jcVariableDecl.getName())))
@@ -46,6 +51,9 @@ internal class GetterProcessorImpl : SingleAnnotationProcessor() {
                     List.nil(), List.nil(), List.nil(), body, null)
         }
 
+        /**
+         * getName
+         */
         private fun getNewMethodName(name: Name): Name {
             val str = name.toString()
             if (str.isNotEmpty()) {
