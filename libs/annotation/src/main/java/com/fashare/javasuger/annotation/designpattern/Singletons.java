@@ -1,4 +1,4 @@
-package com.fashare.javasuger.annotation;
+package com.fashare.javasuger.annotation.designpattern;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -24,6 +24,7 @@ public class Singletons {
         if (method == null) {
             try {
                 method = singletonClazz.getDeclaredMethod(methodName);
+                method.setAccessible(true);
             } catch (NoSuchMethodException ignored) {
             }
 

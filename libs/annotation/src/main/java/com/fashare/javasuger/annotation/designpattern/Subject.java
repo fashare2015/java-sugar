@@ -1,4 +1,4 @@
-package com.fashare.javasuger.annotation;
+package com.fashare.javasuger.annotation.designpattern;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

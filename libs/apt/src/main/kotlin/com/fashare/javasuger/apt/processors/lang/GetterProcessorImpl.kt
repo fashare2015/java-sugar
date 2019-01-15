@@ -20,6 +20,7 @@ internal class GetterProcessorImpl : SingleAnnotationProcessor() {
     }
 
     inner class MyTreeTranslator(val rootClazzName: Name) : TreeTranslator() {
+
         override fun visitClassDef(jcClassDecl: JCClassDecl) {
             if (jcClassDecl.name.equals(rootClazzName)) {
                 jcClassDecl.defs

@@ -3,7 +3,7 @@ package com.fashare.javasuger;
 import android.content.Context;
 import android.widget.Toast;
 
-import com.fashare.javasuger.annotation.Singleton;
+import com.fashare.javasuger.annotation.designpattern.Singleton;
 
 @Singleton
 public class UserManager {

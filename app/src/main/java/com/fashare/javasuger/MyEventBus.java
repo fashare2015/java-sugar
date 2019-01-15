@@ -1,6 +1,6 @@
 package com.fashare.javasuger;
 
-import com.fashare.javasuger.annotation.Subject;
+import com.fashare.javasuger.annotation.designpattern.Subject;
 
 
 @Subject

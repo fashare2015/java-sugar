@@ -1,6 +1,6 @@
-package com.fashare.javasuger.apt
+package com.fashare.javasuger.apt.processors.designpattern
 
-import com.fashare.javasuger.annotation.Subject
+import com.fashare.javasuger.annotation.designpattern.Subject
 import com.fashare.javasuger.apt.base.BaseProcessor
 import com.fashare.javasuger.apt.util.logd
 import com.sun.tools.javac.code.Flags

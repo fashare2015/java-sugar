@@ -1,4 +1,4 @@
-package com.fashare.javasuger.apt;
+package com.fashare.javasuger.apt.processors.designpattern;
 
 
 import com.fashare.javasuger.apt.base.ProxyProcessor;

@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import com.fashare.javasuger.annotation.Singletons;
+import com.fashare.javasuger.annotation.designpattern.Singletons;
 
 public class MainActivity extends AppCompatActivity {
 
