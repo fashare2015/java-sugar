@@ -53,6 +53,8 @@ internal class SubjectProcessorImpl : BaseProcessor() {
             val jcClassName = jcClassDecl.name.toString()
             logd("visitClassDef: class name = $jcClassName, rootClazzName = $rootClazzName")
             if (jcClassDecl.name.equals(rootClazzName)) {
+                treeMaker.at(jcClassDecl.pos)
+
                 // 添加 private List _mObserverList = new ArrayList();
                 makeObserversFieldDecl(jcClassDecl)
 
