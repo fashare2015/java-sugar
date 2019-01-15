@@ -1,0 +1,22 @@
+apply from: '../../java_lib.gradle'
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "net.ltgt.gradle:gradle-apt-plugin:0.20"
+    }
+}
+
+apply plugin: "net.ltgt.apt"
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+
+    compile project(':libs:annotation')
+    annotationProcessor project(":libs:apt")
+    testAnnotationProcessor project(":libs:apt")
+}

@@ -30,7 +30,7 @@ internal class SubjectProcessorImpl : BaseProcessor() {
                     val treePath = trees.getPath(it)
                     val tree = treePath.compilationUnit as JCTree
                     logd("process find class = $it, jcTree = ${tree.javaClass.simpleName}")
-                    tree.accept(MyTreeTranslator(it.simpleName))
+                    tree.accept(MyTreeTranslator(it.simpleName as Name))
                 }
 
         logd("process end !!!")
@@ -116,8 +116,8 @@ internal class SubjectProcessorImpl : BaseProcessor() {
                     List.nil(),
                     List.of(treeMaker.VarDef(treeMaker.Modifiers(Flags.PARAMETER),
                             names.fromString(param),
-                            treeMaker.Ident(names.fromString(paramType))
-                            , null)
+                            treeMaker.Ident(names.fromString(paramType)),
+                            null)
                     ),
                     List.nil(),
                     body.invoke(), null)

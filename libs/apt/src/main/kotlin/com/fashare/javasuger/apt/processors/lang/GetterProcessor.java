@@ -1,4 +1,4 @@
-package com.fashare.javasuger.apt;
+package com.fashare.javasuger.apt.processors.lang;
 
 
 import com.fashare.javasuger.apt.base.ProxyProcessor;
@@ -10,8 +10,8 @@ import javax.annotation.processing.Processor;
  * 由于 @AutoService 不支持 kotlin, 加一层代理
  */
 @AutoService(Processor.class)
-public class AstPrintProcessor extends ProxyProcessor {
-    public AstPrintProcessor() {
-        super(new AstPrintProcessorImpl());
+public class GetterProcessor extends ProxyProcessor {
+    public GetterProcessor() {
+        super(new GetterProcessorImpl());
     }
 }
