@@ -78,9 +78,9 @@ internal class GetterProcessor : SingleAnnotationProcessor() {
         }
 
         /**
-        public String getName() {
-        return this.name;
-        }
+         *   public String getName() {
+         *      return this.name;
+         *   }
          */
         private fun makeGetterMethodDecl(jcVariableDecl: JCVariableDecl): JCTree {
             val body = ListBuffer<JCStatement>()
