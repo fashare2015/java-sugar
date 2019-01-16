@@ -14,9 +14,9 @@ import javax.lang.model.util.Elements
 
 abstract class BaseProcessor : AbstractProcessor() {
     // apt 相关类
-    protected val mFiler: Filer get() = EnvUtil.mFiler
-    protected val mElementUtils: Elements get() = EnvUtil.mElementUtils
-    protected val mMessager: Messager get() = EnvUtil.mMessager
+    protected val filer: Filer get() = EnvUtil.filer
+    protected val elements: Elements get() = EnvUtil.elements
+    protected val messager: Messager get() = EnvUtil.messager
 
     // javac 编译器相关类
     protected val trees: Trees get() = EnvUtil.trees

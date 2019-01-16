@@ -16,9 +16,9 @@ internal object EnvUtil {
     private var env: ProcessingEnvironment? = null
 
     // apt 相关类
-    lateinit var mFiler: Filer              //文件相关的辅助类
-    lateinit var mElementUtils: Elements    //元素相关的辅助类
-    lateinit var mMessager: Messager        //日志相关的辅助类
+    lateinit var filer: Filer              //文件相关的辅助类
+    lateinit var elements: Elements    //元素相关的辅助类
+    lateinit var messager: Messager        //日志相关的辅助类
 
     // javac 编译器相关类
     lateinit var trees: Trees
@@ -31,9 +31,9 @@ internal object EnvUtil {
         }
         this.env = env
 
-        mFiler = env.filer
-        mElementUtils = env.elementUtils
-        mMessager = env.messager
+        filer = env.filer
+        elements = env.elementUtils
+        messager = env.messager
 
         trees = Trees.instance(env)
         val context = (env as JavacProcessingEnvironment).context

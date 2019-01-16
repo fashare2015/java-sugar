@@ -2,6 +2,7 @@ package com.fashare.javasuger.apt.processors.lang
 
 import com.fashare.javasuger.annotation.lang.Setter
 import com.fashare.javasuger.apt.base.SingleAnnotationProcessor
+import com.google.auto.service.AutoService
 import com.sun.source.tree.Tree
 import com.sun.tools.javac.code.Flags
 import com.sun.tools.javac.code.TypeTag
@@ -11,20 +12,22 @@ import com.sun.tools.javac.tree.TreeTranslator
 import com.sun.tools.javac.util.List
 import com.sun.tools.javac.util.ListBuffer
 import com.sun.tools.javac.util.Name
+import javax.annotation.processing.Processor
 import javax.lang.model.element.TypeElement
 
-internal class SetterProcessorImpl : SingleAnnotationProcessor() {
+@AutoService(Processor::class)
+internal class SetterProcessor : SingleAnnotationProcessor() {
     override val mAnnotation = Setter::class.java
 
     override fun translator(curElement: TypeElement, curTree: JCTree, rootTree: JCCompilationUnit) {
         curTree.accept(MyTreeTranslator(curElement.simpleName as Name))
     }
 
-    inner class MyTreeTranslator(val rootClazzName: Name) : TreeTranslator() {
-        val shouldReturnThis = true
+    inner class MyTreeTranslator(private val rootClazzName: Name) : TreeTranslator() {
+        private val shouldReturnThis = true
 
         override fun visitClassDef(jcClassDecl: JCClassDecl) {
-            if (jcClassDecl.name.equals(rootClazzName)) {
+            if (jcClassDecl.name == rootClazzName) {
                 treeMaker.at(jcClassDecl.pos)
                 jcClassDecl.defs
                         .filter { it.kind == Tree.Kind.VARIABLE }
@@ -79,10 +82,10 @@ internal class SetterProcessorImpl : SingleAnnotationProcessor() {
          */
         private fun getNewMethodName(name: Name): Name {
             val str = name.toString()
-            if (str.isNotEmpty()) {
-                return names.fromString("set" + str.substring(0, 1).toUpperCase() + str.substring(1, str.length))
+            return if (str.isNotEmpty()) {
+                names.fromString("set" + str.substring(0, 1).toUpperCase() + str.substring(1, str.length))
             } else {
-                return names.fromString("set")
+                names.fromString("set")
             }
         }
     }

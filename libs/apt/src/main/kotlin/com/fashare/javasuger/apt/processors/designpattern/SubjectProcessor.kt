@@ -2,6 +2,7 @@ package com.fashare.javasuger.apt.processors.designpattern
 
 import com.fashare.javasuger.annotation.designpattern.Subject
 import com.fashare.javasuger.apt.base.SingleAnnotationProcessor
+import com.google.auto.service.AutoService
 import com.sun.tools.javac.code.Flags
 import com.sun.tools.javac.code.TypeTag
 import com.sun.tools.javac.tree.JCTree
@@ -9,16 +10,18 @@ import com.sun.tools.javac.tree.JCTree.*
 import com.sun.tools.javac.tree.TreeTranslator
 import com.sun.tools.javac.util.List
 import com.sun.tools.javac.util.Name
+import javax.annotation.processing.Processor
 import javax.lang.model.element.TypeElement
 
-internal class SubjectProcessorImpl : SingleAnnotationProcessor() {
+@AutoService(Processor::class)
+internal class SubjectProcessor : SingleAnnotationProcessor() {
     override val mAnnotation = Subject::class.java
 
     override fun translator(curElement: TypeElement, curTree: JCTree, rootTree: JCTree.JCCompilationUnit) {
         rootTree.accept(MyTreeTranslator(curElement.simpleName as Name))
     }
 
-    inner class MyTreeTranslator(val rootClazzName: Name) : TreeTranslator() {
+    inner class MyTreeTranslator(private val rootClazzName: Name) : TreeTranslator() {
 
         override fun visitTopLevel(cu: JCTree.JCCompilationUnit) {
             cu.defs = cu.defs.prepend(
@@ -27,7 +30,7 @@ internal class SubjectProcessorImpl : SingleAnnotationProcessor() {
         }
 
         override fun visitClassDef(jcClassDecl: JCClassDecl) {
-            if (jcClassDecl.name.equals(rootClazzName)) {
+            if (jcClassDecl.name == rootClazzName) {
                 treeMaker.at(jcClassDecl.pos)
 
                 // 添加 private List _mObserverList = new ArrayList();

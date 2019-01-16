@@ -8,11 +8,11 @@ import javax.lang.model.element.TypeElement
 abstract class SingleAnnotationProcessor : BaseProcessor() {
     abstract val mAnnotation: Class<out Annotation>
 
-    override final fun getSupportedAnnotationTypes(): Set<String> {
+    final override fun getSupportedAnnotationTypes(): Set<String> {
         return setOf(mAnnotation.canonicalName)
     }
 
-    override final fun process(set: Set<TypeElement>, roundEnvironment: RoundEnvironment): Boolean {
+    final override fun process(set: Set<TypeElement>, roundEnvironment: RoundEnvironment): Boolean {
         logd("process begin !!! set = $set")
 
         roundEnvironment.getElementsAnnotatedWith(mAnnotation)

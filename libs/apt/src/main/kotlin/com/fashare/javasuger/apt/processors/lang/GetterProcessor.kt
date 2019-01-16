@@ -2,6 +2,7 @@ package com.fashare.javasuger.apt.processors.lang
 
 import com.fashare.javasuger.annotation.lang.Getter
 import com.fashare.javasuger.apt.base.SingleAnnotationProcessor
+import com.google.auto.service.AutoService
 import com.sun.source.tree.Tree
 import com.sun.tools.javac.code.Flags
 import com.sun.tools.javac.tree.JCTree
@@ -10,19 +11,21 @@ import com.sun.tools.javac.tree.TreeTranslator
 import com.sun.tools.javac.util.List
 import com.sun.tools.javac.util.ListBuffer
 import com.sun.tools.javac.util.Name
+import javax.annotation.processing.Processor
 import javax.lang.model.element.TypeElement
 
-internal class GetterProcessorImpl : SingleAnnotationProcessor() {
+@AutoService(Processor::class)
+internal class GetterProcessor : SingleAnnotationProcessor() {
     override val mAnnotation = Getter::class.java
 
     override fun translator(curElement: TypeElement, curTree: JCTree, rootTree: JCCompilationUnit) {
         curTree.accept(MyTreeTranslator(curElement.simpleName as Name))
     }
 
-    inner class MyTreeTranslator(val rootClazzName: Name) : TreeTranslator() {
+    inner class MyTreeTranslator(private val rootClazzName: Name) : TreeTranslator() {
 
         override fun visitClassDef(jcClassDecl: JCClassDecl) {
-            if (jcClassDecl.name.equals(rootClazzName)) {
+            if (jcClassDecl.name == rootClazzName) {
                 jcClassDecl.defs
                         .filter { it.kind == Tree.Kind.VARIABLE }
                         .map { it as JCVariableDecl }
@@ -56,10 +59,10 @@ internal class GetterProcessorImpl : SingleAnnotationProcessor() {
          */
         private fun getNewMethodName(name: Name): Name {
             val str = name.toString()
-            if (str.isNotEmpty()) {
-                return names.fromString("get" + str.substring(0, 1).toUpperCase() + str.substring(1, str.length))
+            return if (str.isNotEmpty()) {
+                names.fromString("get" + str.substring(0, 1).toUpperCase() + str.substring(1, str.length))
             } else {
-                return names.fromString("get")
+                names.fromString("get")
             }
         }
     }
