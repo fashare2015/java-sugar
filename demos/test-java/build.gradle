@@ -11,6 +11,11 @@ buildscript {
     }
 }
 
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+    test.java.srcDirs += 'build/generated/sources/annotationProcessor/java/test'
+}
+
 apply plugin: "net.ltgt.apt"
 
 dependencies {

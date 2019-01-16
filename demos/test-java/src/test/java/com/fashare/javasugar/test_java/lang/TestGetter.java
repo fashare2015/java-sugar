@@ -1,5 +1,6 @@
 package com.fashare.javasugar.test_java.lang;
 
+import com.fashare.javasugar.annotation.lang.Instances;
 import com.fashare.javasugar.test_java.util.AssertUtil;
 
 import org.junit.Test;
@@ -24,7 +25,8 @@ public class TestGetter {
         AssertUtil.assertMethodExist(true, User.class, "getId");
         AssertUtil.assertMethodExist(true, User.class, "getPhoneNums");
 
-        User user = new User();
+//        User user = new User();
+        User user = Instances.get(User.class);
         assertEquals(user.getName(), "fashare");
         assertEquals(user.getId(), 5);
         assertEquals(user.getPhoneNums().toArray(new String[0]),
@@ -36,7 +38,8 @@ public class TestGetter {
         AssertUtil.assertMethodExist(true, User.Phone.class, "getOs");
         AssertUtil.assertMethodExist(true, User.Phone.class, "getPrice");
 
-        User.Phone phone = new User.Phone();
+//        User.Phone phone = new User.Phone();
+        User.Phone phone = Instances.get(User.Phone.class);
         assertEquals(phone.getOs(), "Android");
         assertEquals(phone.getPrice(), 1234);
     }
