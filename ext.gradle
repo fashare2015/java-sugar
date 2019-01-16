@@ -11,7 +11,7 @@ project.ext {
             versionCode      : 1,
             versionName      : "1.0",
 
-            applicationId    : "com.fashare.javasuger"
+            applicationId    : "com.fashare.javasugar"
     ]
 
     // kotlin
