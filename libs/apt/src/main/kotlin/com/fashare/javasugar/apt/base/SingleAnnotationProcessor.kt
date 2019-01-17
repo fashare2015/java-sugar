@@ -2,6 +2,7 @@ package com.fashare.javasugar.apt.base
 
 import com.fashare.javasugar.apt.util.logd
 import com.sun.tools.javac.tree.JCTree
+import java.io.IOException
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.TypeElement
 
@@ -32,12 +33,22 @@ abstract class SingleAnnotationProcessor : BaseProcessor() {
                     val cu = treePath.compilationUnit as JCTree.JCCompilationUnit
                     rootTree = cu
                     logd("process find class = $it, jcTree = ${cu.javaClass.simpleName}")
-                    translator(it, trees.getTree(it) as JCTree, cu)
+                    translate(it, trees.getTree(it) as JCTree)
+
+                    try {
+                        generateJavaFile(it, trees.getTree(it) as JCTree)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
                 }
 
         logd("process end !!!")
         return true
     }
 
-    abstract fun translator(curElement: TypeElement, curTree: JCTree, rootTree: JCTree.JCCompilationUnit)
+
+    abstract fun translate(curElement: TypeElement, curTree: JCTree)
+
+    @Throws(IOException::class)
+    open fun generateJavaFile(curElement: TypeElement, curTree: JCTree){}
 }

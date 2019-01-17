@@ -1,24 +1,62 @@
 package com.fashare.javasugar.apt.processors.designpattern
 
+import com.fashare.javasugar.annotation.designpattern.ISubject
+import com.fashare.javasugar.annotation.designpattern.Observer
 import com.fashare.javasugar.annotation.designpattern.Subject
 import com.fashare.javasugar.apt.base.SingleAnnotationProcessor
+import com.fashare.javasugar.apt.util.asField
+import com.fashare.javasugar.apt.util.asGetter
+import com.fashare.javasugar.apt.util.getValue
 import com.google.auto.service.AutoService
+import com.squareup.javapoet.*
 import com.sun.tools.javac.code.Flags
+import com.sun.tools.javac.code.Type
 import com.sun.tools.javac.code.TypeTag
 import com.sun.tools.javac.tree.JCTree
 import com.sun.tools.javac.tree.JCTree.*
 import com.sun.tools.javac.tree.TreeTranslator
 import com.sun.tools.javac.util.List
+import com.sun.tools.javac.util.ListBuffer
 import com.sun.tools.javac.util.Name
 import javax.annotation.processing.Processor
+import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
+
 
 @AutoService(Processor::class)
 internal class SubjectProcessor : SingleAnnotationProcessor() {
     override val mAnnotation = Subject::class.java
 
-    override fun translator(curElement: TypeElement, curTree: JCTree, rootTree: JCTree.JCCompilationUnit) {
-        rootTree.accept(MyTreeTranslator(curElement.simpleName as Name))
+    var mObservers = emptyArray<Observer>()
+
+    override fun translate(curElement: TypeElement, curTree: JCTree) {
+        mObservers = curElement.getAnnotation(mAnnotation).value
+
+        rootTree?.accept(MyTreeTranslator(curElement.simpleName as Name))
+    }
+
+    override fun generateJavaFile(curElement: TypeElement, curTree: JCTree) {
+        getJavaFile(curElement).writeTo(filer)
+    }
+
+    private fun getJavaFile(curElement: TypeElement): JavaFile {
+        val packageName = rootTree?.packageName?.toString() ?: ""
+
+        val curISubject = TypeSpec.interfaceBuilder("${curElement.qualifiedName.substring(packageName.length + 1).replace(".", "$$")}\$\$ISubject")
+                .addModifiers(Modifier.PUBLIC)
+                .apply {
+                    mObservers.forEach { observer ->
+                        this.addMethod(MethodSpec.methodBuilder("${observer.name}Subject".asGetter())
+                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                                .returns(ParameterizedTypeName.get(ClassName.get(ISubject::class.java), ClassName.get(observer.getValue())))
+                                .build()
+                        )
+                    }
+                }
+                .build()
+
+        return JavaFile.builder(packageName, curISubject)
+                .build()
     }
 
     inner class MyTreeTranslator(private val rootClazzName: Name) : TreeTranslator() {
@@ -35,7 +73,7 @@ internal class SubjectProcessor : SingleAnnotationProcessor() {
                 treeMaker.at(jcClassDecl.pos)
 
                 // 添加 private List _mObserverList = new ArrayList();
-                makeObserversFieldDecl(jcClassDecl)
+                makeISubjectFieldAndGetter(jcClassDecl)
 
                 // implement Subject.Stub
 //                implementSubjectStub(jcClassDecl)
@@ -46,19 +84,39 @@ internal class SubjectProcessor : SingleAnnotationProcessor() {
             super.visitClassDef(jcClassDecl)
         }
 
-        private fun makeObserversFieldDecl(jcClassDecl: JCClassDecl) {
-            val observersField = treeMaker.VarDef(
-                    treeMaker.Modifiers(Flags.PUBLIC.toLong()),
-                    names.fromString("_mObserverList"),
-                    treeMaker.TypeApply(treeMaker.Ident(names.fromString("ISubject")),
-                            List.of(treeMaker.Ident(names.fromString("OnClickListener")))),
-                    treeMaker.NewClass(null, List.nil(),
-                            treeMaker.TypeApply(treeMaker.Select(treeMaker.Ident(names.fromString("ISubject")), names.fromString("Stub")),
-                                    List.of(treeMaker.Ident(names.fromString("OnClickListener")))),
-                            List.nil(),
-                            treeMaker.AnonymousClassDef(treeMaker.Modifiers(0), List.nil())))
+        private fun makeISubjectFieldAndGetter(jcClassDecl: JCClassDecl) {
+            mObservers.forEach { observer ->
+                val iSubject = treeMaker.Ident(names.fromString("ISubject"))
+                val iSubjectStub = treeMaker.Select(treeMaker.Ident(names.fromString("ISubject")), names.fromString("Stub"))
+                val typeParam = treeMaker.Ident((observer.getValue() as? Type)?.asElement()?.simpleName)
+                val fieldName = names.fromString("_${observer.name.asField()}")
 
-            jcClassDecl.defs = jcClassDecl.defs.prepend(observersField)
+                val iSubjectField = treeMaker.VarDef(
+                        treeMaker.Modifiers(Flags.PRIVATE.toLong()),
+                        fieldName,
+                        treeMaker.TypeApply(iSubject, List.of(typeParam)),    // 泛型 ISubject<typeParam>
+                        treeMaker.NewClass(null, List.nil(),
+                                treeMaker.TypeApply(iSubjectStub, List.of(typeParam)),
+                                List.nil(),
+                                treeMaker.AnonymousClassDef(treeMaker.Modifiers(0), List.nil())))
+
+                jcClassDecl.defs = jcClassDecl.defs.prepend(iSubjectField)
+
+                // getter method
+                val methodName = names.fromString("${observer.name}Subject".asGetter())
+                val body = ListBuffer<JCStatement>()
+                        .append(treeMaker.Return(treeMaker.Select(treeMaker.Ident(names._this), fieldName)))
+                        .toList()
+                        .let { treeMaker.Block(0, it) }
+
+                val iSubjectGetter = treeMaker.MethodDef(
+                        treeMaker.Modifiers(Flags.PUBLIC.toLong()),
+                        methodName,
+                        iSubjectField.vartype,
+                        List.nil(), List.nil(), List.nil(), body, null)
+
+                jcClassDecl.defs = jcClassDecl.defs.prepend(iSubjectGetter)
+            }
         }
 
         // 是否有更简洁的方法

@@ -3,6 +3,7 @@ package com.fashare.javasugar.apt.processors.lang
 import com.fashare.javasugar.annotation.lang.Setter
 import com.fashare.javasugar.apt.base.SingleAnnotationProcessor
 import com.fashare.javasugar.apt.util.appendIf
+import com.fashare.javasugar.apt.util.asSetter
 import com.fashare.javasugar.apt.util.contains
 import com.google.auto.service.AutoService
 import com.squareup.javapoet.ClassName
@@ -18,7 +19,6 @@ import com.sun.tools.javac.tree.TreeTranslator
 import com.sun.tools.javac.util.List
 import com.sun.tools.javac.util.ListBuffer
 import com.sun.tools.javac.util.Name
-import java.io.IOException
 import javax.annotation.processing.Processor
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
@@ -31,16 +31,14 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
 
     private var returnThis = true
 
-    override fun translator(curElement: TypeElement, curTree: JCTree, rootTree: JCCompilationUnit) {
+    override fun translate(curElement: TypeElement, curTree: JCTree) {
         returnThis = curElement.getAnnotation(mAnnotation).returnThis
 
         curTree.accept(MyTreeTranslator(curElement.simpleName as Name))
+    }
 
-        try {
-            getJavaFile(curElement).writeTo(filer)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
+    override fun generateJavaFile(curElement: TypeElement, curTree: JCTree) {
+        getJavaFile(curElement).writeTo(filer)
     }
 
     private fun getJavaFile(curElement: TypeElement): JavaFile {
@@ -50,7 +48,7 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
                 .addModifiers(Modifier.PUBLIC)
                 .apply {
                     mFields.forEach {
-                        this.addMethod(MethodSpec.methodBuilder(getNewMethodName(it.name).toString())
+                        this.addMethod(MethodSpec.methodBuilder(it.name.toString().asSetter())
                                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                                 .apply {
                                     if (returnThis)
@@ -115,7 +113,7 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
 
             return treeMaker.MethodDef(
                     treeMaker.Modifiers(Flags.PUBLIC.toLong()),
-                    getNewMethodName(jcVariableDecl.getName()),
+                    names.fromString(jcVariableDecl.getName().toString().asSetter()),
                     if (returnThis) {
                         treeMaker.Ident(jcClassDecl.name)
                     } else {
@@ -129,18 +127,6 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
                     ),
                     List.nil(),
                     body, null)
-        }
-    }
-
-    /**
-     * setName
-     */
-    private fun getNewMethodName(name: Name): Name {
-        val str = name.toString()
-        return if (str.isNotEmpty()) {
-            names.fromString("set" + str.substring(0, 1).toUpperCase() + str.substring(1, str.length))
-        } else {
-            names.fromString("set")
         }
     }
 }

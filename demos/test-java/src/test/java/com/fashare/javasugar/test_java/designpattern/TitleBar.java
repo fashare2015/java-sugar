@@ -8,15 +8,18 @@ import com.fashare.javasugar.annotation.designpattern.Subject;
  */
 
 @Subject({
-        @Observer(value = TitleBar.OnClickListener.class, name = "onClick"),
-        @Observer(value = TitleBar.OnScrollListener.class, name = "onScroll"),
+        @Observer(value = TitleBar.OnClickListener.class, name = "Click"),
+        @Observer(value = TitleBar.OnScrollListener.class, name = "Scroll"),
+        @Observer(value = Runnable.class, name = "Runnable"),
 })
-public class TitleBar {
+abstract class TitleBar implements TitleBar$$ISubject {
     public interface OnClickListener {
         void onClick(TitleBar self);
     }
 
     public interface OnScrollListener {
-        void onScroll(TitleBar self, int dy);
+        void onScrolled(TitleBar self, int dy);
+
+        void onScrollChange(TitleBar self, int scrollState);
     }
 }

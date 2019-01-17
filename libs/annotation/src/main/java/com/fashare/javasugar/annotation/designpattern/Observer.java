@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 public @interface Observer {
     Class<?> value();
 
-    String name() default "observer";
+    String name();
 }

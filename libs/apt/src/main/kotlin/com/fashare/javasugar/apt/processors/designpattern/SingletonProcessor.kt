@@ -19,7 +19,7 @@ import javax.lang.model.element.TypeElement
 internal class SingletonProcessor : SingleAnnotationProcessor() {
     override val mAnnotation = Singleton::class.java
 
-    override fun translator(curElement: TypeElement, curTree: JCTree, rootTree: JCTree.JCCompilationUnit) {
+    override fun translate(curElement: TypeElement, curTree: JCTree) {
         curTree.accept(MyTreeTranslator(curElement.simpleName as Name))
     }
 

@@ -3,6 +3,7 @@ package com.fashare.javasugar.apt.processors.lang
 import com.fashare.javasugar.annotation.lang.Getter
 import com.fashare.javasugar.apt.base.SingleAnnotationProcessor
 import com.fashare.javasugar.apt.util.appendIf
+import com.fashare.javasugar.apt.util.asGetter
 import com.fashare.javasugar.apt.util.contains
 import com.google.auto.service.AutoService
 import com.squareup.javapoet.ClassName
@@ -17,7 +18,6 @@ import com.sun.tools.javac.tree.TreeTranslator
 import com.sun.tools.javac.util.List
 import com.sun.tools.javac.util.ListBuffer
 import com.sun.tools.javac.util.Name
-import java.io.IOException
 import javax.annotation.processing.Processor
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
@@ -28,14 +28,12 @@ internal class GetterProcessor : SingleAnnotationProcessor() {
 
     private var mFields: List<JCVariableDecl> = List.nil()
 
-    override fun translator(curElement: TypeElement, curTree: JCTree, rootTree: JCCompilationUnit) {
+    override fun translate(curElement: TypeElement, curTree: JCTree) {
         curTree.accept(MyTreeTranslator(curElement.simpleName as Name))
+    }
 
-        try {
-            getJavaFile(curElement).writeTo(filer)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
+    override fun generateJavaFile(curElement: TypeElement, curTree: JCTree) {
+        getJavaFile(curElement).writeTo(filer)
     }
 
     private fun getJavaFile(curElement: TypeElement): JavaFile {
@@ -45,11 +43,9 @@ internal class GetterProcessor : SingleAnnotationProcessor() {
                 .addModifiers(Modifier.PUBLIC)
                 .apply {
                     mFields.forEach {
-                        this.addMethod(MethodSpec.methodBuilder(getNewMethodName(it.name).toString())
+                        this.addMethod(MethodSpec.methodBuilder(it.name.toString().asGetter())
                                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                                 .returns(ClassName.get(it.sym.asType()))
-//                                .addParameter(Array<String>::class.java, "args")
-//                .addStatement("\$T.out.println(\$S)", System::class.java, "Hello, JavaPoet!")
                                 .build()
                         )
                     }
@@ -96,21 +92,9 @@ internal class GetterProcessor : SingleAnnotationProcessor() {
 
             return treeMaker.MethodDef(
                     treeMaker.Modifiers(Flags.PUBLIC.toLong()),
-                    getNewMethodName(jcVariableDecl.getName()),
+                    names.fromString(jcVariableDecl.getName().toString().asGetter()),
                     jcVariableDecl.vartype,
                     List.nil(), List.nil(), List.nil(), body, null)
-        }
-    }
-
-    /**
-     * getName
-     */
-    private fun getNewMethodName(name: Name): Name {
-        val str = name.toString()
-        return if (str.isNotEmpty()) {
-            names.fromString("get" + str.substring(0, 1).toUpperCase() + str.substring(1, str.length))
-        } else {
-            names.fromString("get")
         }
     }
 }

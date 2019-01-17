@@ -8,31 +8,31 @@ import static org.junit.Assert.assertEquals;
 
 public class TestTitleBar {
 
-    private boolean onBackClickCalled;
+    private boolean onClickCalled;
     private TitleBar titleBar = Instances.get(TitleBar.class);
     private TitleBar.OnClickListener onClickListener = new TitleBar.OnClickListener() {
         @Override
         public void onClick(TitleBar self) {
-            onBackClickCalled = true;
+            onClickCalled = true;
         }
     };
 
     @Test
     public void register_and_notify() {
-        titleBar._mObserverList.clear();
-        titleBar._mObserverList.add(onClickListener);
+        titleBar.getClickSubject().clear();
+        titleBar.getClickSubject().add(onClickListener);
 
-        onBackClickCalled = false;
-        titleBar._mObserverList.asNotifier().onClick(titleBar);
-        assertEquals(onBackClickCalled, true);
+        onClickCalled = false;
+        titleBar.getClickSubject().asNotifier().onClick(titleBar);
+        assertEquals(onClickCalled, true);
     }
 
     @Test
     public void unRegister_and_notify() {
-        titleBar._mObserverList.clear();
+        titleBar.getClickSubject().remove(onClickListener);
 
-        onBackClickCalled = false;
-        titleBar._mObserverList.asNotifier().onClick(titleBar);
-        assertEquals(onBackClickCalled, false);
+        onClickCalled = false;
+        titleBar.getClickSubject().asNotifier().onClick(titleBar);
+        assertEquals(onClickCalled, false);
     }
 }
