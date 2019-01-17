@@ -9,16 +9,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by apple on 2019/1/15.
  */
 
 public class TestSetter {
-    @Test
-    public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
-    }
 
     @Test
     public void setter_exist() {
@@ -55,5 +52,19 @@ public class TestSetter {
     @Test
     public void inner_setter_not_exist() {
         AssertUtil.assertMethodExist(false, User.NoAnnotation.class, "setName", String.class);
+    }
+
+    // User2
+    @Test
+    public void User2_setter_exist() {
+        AssertUtil.assertMethodExist(true, User2.class, "setName", String.class);
+        AssertUtil.assertMethodExist(true, User2.class, "setId", int.class);
+
+        User2 user = Instances.get(User2.class)
+                .setName("google")
+                .setId(50);
+
+        assertNotEquals(user.getId(), 50);
+        assertEquals(user.getId(), 999);
     }
 }

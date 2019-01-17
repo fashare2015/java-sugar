@@ -2,6 +2,7 @@ package com.fashare.javasugar.apt.processors.lang
 
 import com.fashare.javasugar.annotation.lang.Setter
 import com.fashare.javasugar.apt.base.SingleAnnotationProcessor
+import com.fashare.javasugar.apt.util.contains
 import com.google.auto.service.AutoService
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.JavaFile
@@ -51,7 +52,7 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
                         this.addMethod(MethodSpec.methodBuilder(getNewMethodName(it.name).toString())
                                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                                 .apply {
-                                    if(returnThis)
+                                    if (returnThis)
                                         this.returns(ClassName.get(curElement.asType()))
                                     else
                                         this.returns(Void.TYPE)
@@ -78,7 +79,12 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
                         .map { it as JCVariableDecl }
                         .forEach {
                             mFields = mFields.append(it)
-                            jcClassDecl.defs = jcClassDecl.defs.append(makeSetterMethodDecl(it, jcClassDecl))
+
+                            makeSetterMethodDecl(it, jcClassDecl).apply {
+                                if (!jcClassDecl.contains(this)) {
+                                    jcClassDecl.defs = jcClassDecl.defs.append(this)
+                                }
+                            }
                         }
 
                 // 去掉 abstract
@@ -93,7 +99,7 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
          *      return this;
          *  }
          */
-        private fun makeSetterMethodDecl(jcVariableDecl: JCVariableDecl, jcClassDecl: JCClassDecl): JCTree {
+        private fun makeSetterMethodDecl(jcVariableDecl: JCVariableDecl, jcClassDecl: JCClassDecl): JCMethodDecl {
             val body = ListBuffer<JCStatement>()
                     .append(treeMaker.Exec(treeMaker.Assign(
                             treeMaker.Select(treeMaker.Ident(names._this), jcVariableDecl.getName()),

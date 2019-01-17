@@ -17,11 +17,6 @@ import static org.junit.Assert.assertEquals;
 public class TestSingleton {
 
     @Test
-    public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
-    }
-
-    @Test
     public void getter_exist() {
         AssertUtil.assertMethodExist(true, UserManager.class, "getInstance");
 

@@ -1,7 +1,7 @@
 package com.fashare.javasugar.apt.processors.designpattern
 
-import com.fashare.javasugar.apt.base.SingleAnnotationProcessor
 import com.fashare.javasugar.annotation.designpattern.Singleton
+import com.fashare.javasugar.apt.base.SingleAnnotationProcessor
 import com.google.auto.service.AutoService
 import com.sun.tools.javac.code.Flags
 import com.sun.tools.javac.tree.JCTree
@@ -33,9 +33,9 @@ internal class SingletonProcessor : SingleAnnotationProcessor() {
         }
 
         /**
-            public static UserManager getInstance() {
-                return UserManager._InstanceHolder._sInstance;
-            }
+         *   public static UserManager getInstance() {
+         *       return UserManager._InstanceHolder._sInstance;
+         *   }
          */
         private fun makeGetInstanceMethodDecl(jcClassDecl: JCClassDecl): JCTree {
             val body = ListBuffer<JCTree.JCStatement>()
@@ -51,9 +51,9 @@ internal class SingletonProcessor : SingleAnnotationProcessor() {
         }
 
         /**
-            private static class _InstanceHolder {
-                private static final UserManager _sInstance = new UserManager();
-            }
+         *   private static class _InstanceHolder {
+         *       private static final UserManager _sInstance = new UserManager();
+         *   }
          */
         private fun makeInstanceHolderDecl(jcClassDecl: JCClassDecl): JCTree {
             return treeMaker.ClassDef(

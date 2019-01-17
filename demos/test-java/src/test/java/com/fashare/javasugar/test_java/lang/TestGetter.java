@@ -8,16 +8,13 @@ import org.junit.Test;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by apple on 2019/1/15.
  */
 
 public class TestGetter {
-    @Test
-    public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
-    }
 
     @Test
     public void getter_exist() {
@@ -47,5 +44,17 @@ public class TestGetter {
     @Test
     public void inner_getter_not_exist() {
         AssertUtil.assertMethodExist(false, User.NoAnnotation.class, "getName");
+    }
+
+    // User2
+    @Test
+    public void User2_getter_exist() {
+        AssertUtil.assertMethodExist(true, User2.class, "getName");
+        AssertUtil.assertMethodExist(true, User2.class, "getId");
+
+        User2 user = Instances.get(User2.class);
+        assertNotEquals(user.getName(), "fashare");
+        assertEquals(user.getName(), "getName existed");
+        assertEquals(user.getId(), 5);
     }
 }

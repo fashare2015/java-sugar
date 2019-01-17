@@ -8,6 +8,7 @@ public class Instances {
             return singletonClazz.newInstance();
         } catch (Exception ignored) {
         }
-        return null;
+//        return null;
+        throw new IllegalArgumentException(singletonClazz.getSimpleName() + ".<init>() not found");
     }
 }

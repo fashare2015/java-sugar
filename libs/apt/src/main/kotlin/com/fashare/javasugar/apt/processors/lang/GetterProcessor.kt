@@ -2,6 +2,7 @@ package com.fashare.javasugar.apt.processors.lang
 
 import com.fashare.javasugar.annotation.lang.Getter
 import com.fashare.javasugar.apt.base.SingleAnnotationProcessor
+import com.fashare.javasugar.apt.util.contains
 import com.google.auto.service.AutoService
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.JavaFile
@@ -68,7 +69,12 @@ internal class GetterProcessor : SingleAnnotationProcessor() {
                         .map { it as JCVariableDecl }
                         .forEach {
                             mFields = mFields.append(it)
-                            jcClassDecl.defs = jcClassDecl.defs.append(makeGetterMethodDecl(it))
+
+                            makeGetterMethodDecl(it).apply {
+                                if (!jcClassDecl.contains(this)) {
+                                    jcClassDecl.defs = jcClassDecl.defs.append(this)
+                                }
+                            }
                         }
 
                 // 去掉 abstract
@@ -82,7 +88,7 @@ internal class GetterProcessor : SingleAnnotationProcessor() {
          *      return this.name;
          *   }
          */
-        private fun makeGetterMethodDecl(jcVariableDecl: JCVariableDecl): JCTree {
+        private fun makeGetterMethodDecl(jcVariableDecl: JCVariableDecl): JCMethodDecl {
             val body = ListBuffer<JCStatement>()
                     .append(treeMaker.Return(treeMaker.Select(treeMaker.Ident(names._this), jcVariableDecl.getName())))
                     .toList()
