@@ -25,3 +25,18 @@ dependencies {
     annotationProcessor project(":libs:apt")
     testAnnotationProcessor project(":libs:apt")
 }
+
+/**
+ * java.lang.IllegalStateException: endPosTable already set
+ *
+ * javac bug 增量编译报错，删去 apt 生成的文件，绕过该 bug
+ * https://github.com/immutables/immutables/issues/134
+ * https://github.com/google/dagger/issues/147
+ */
+def generatedSrcRoot = file("${buildDir}/generated/sources/annotationProcessor/java/test")
+
+task deleteGeneratedSources(type: Delete) {
+    delete generatedSrcRoot
+}
+
+tasks.withType(JavaCompile) { it.dependsOn('deleteGeneratedSources') }
