@@ -2,6 +2,7 @@ package com.fashare.javasugar.apt.processors.lang
 
 import com.fashare.javasugar.annotation.lang.Setter
 import com.fashare.javasugar.apt.base.SingleAnnotationProcessor
+import com.fashare.javasugar.apt.util.appendIf
 import com.fashare.javasugar.apt.util.contains
 import com.google.auto.service.AutoService
 import com.squareup.javapoet.ClassName
@@ -80,11 +81,10 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
                         .forEach {
                             mFields = mFields.append(it)
 
-                            makeSetterMethodDecl(it, jcClassDecl).apply {
-                                if (!jcClassDecl.contains(this)) {
-                                    jcClassDecl.defs = jcClassDecl.defs.append(this)
-                                }
-                            }
+                            jcClassDecl.defs = jcClassDecl.defs
+                                    .appendIf(makeSetterMethodDecl(it, jcClassDecl)) {
+                                        !jcClassDecl.contains(it as JCMethodDecl)
+                                    }
                         }
 
                 // 去掉 abstract

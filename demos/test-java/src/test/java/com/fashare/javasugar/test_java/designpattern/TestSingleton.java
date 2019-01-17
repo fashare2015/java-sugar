@@ -38,4 +38,12 @@ public class TestSingleton {
 
         Singletons.get(NoAnnotationManager.class);
     }
+
+    @Test
+    public void UserManager2_getter_exist() {
+        AssertUtil.assertMethodExist(true, UserManager2.class, "getInstance");
+
+        User user = Singletons.get(UserManager2.class).mUser;
+        assertEquals(user.getName(), "fashare");
+    }
 }

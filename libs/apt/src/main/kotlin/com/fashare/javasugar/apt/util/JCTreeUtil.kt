@@ -2,6 +2,7 @@ package com.fashare.javasugar.apt.util
 
 import com.sun.tools.javac.tree.JCTree.JCClassDecl
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl
+import com.sun.tools.javac.util.List
 
 fun JCClassDecl.contains(method: JCMethodDecl): Boolean {
     this.defs.forEach {
@@ -24,4 +25,20 @@ fun JCMethodDecl.conflict(that: JCMethodDecl): Boolean {
 
         return true
     }
+}
+
+fun <T> List<T>.appendIf(item: T, validate: (item: T) -> Boolean): List<T> {
+    var result = this
+    if (validate.invoke(item)) {
+        result = this.append(item)
+    }
+    return result
+}
+
+fun <T> List<T>.prependIf(item: T, validate: (item: T) -> Boolean): List<T> {
+    var result = this
+    if (validate.invoke(item)) {
+        result = this.prepend(item)
+    }
+    return result
 }

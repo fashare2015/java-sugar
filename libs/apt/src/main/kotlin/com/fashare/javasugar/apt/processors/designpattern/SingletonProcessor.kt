@@ -2,10 +2,12 @@ package com.fashare.javasugar.apt.processors.designpattern
 
 import com.fashare.javasugar.annotation.designpattern.Singleton
 import com.fashare.javasugar.apt.base.SingleAnnotationProcessor
+import com.fashare.javasugar.apt.util.contains
 import com.google.auto.service.AutoService
 import com.sun.tools.javac.code.Flags
 import com.sun.tools.javac.tree.JCTree
 import com.sun.tools.javac.tree.JCTree.JCClassDecl
+import com.sun.tools.javac.tree.JCTree.JCMethodDecl
 import com.sun.tools.javac.tree.TreeTranslator
 import com.sun.tools.javac.util.List
 import com.sun.tools.javac.util.ListBuffer
@@ -25,9 +27,12 @@ internal class SingletonProcessor : SingleAnnotationProcessor() {
 
         override fun visitClassDef(jcClassDecl: JCClassDecl) {
             if (jcClassDecl.name == rootClazzName) {     // 防止重复访问生成的 _InstanceHolder
-                jcClassDecl.defs = jcClassDecl.defs
-                        .prepend(makeGetInstanceMethodDecl(jcClassDecl))
-                        .prepend(makeInstanceHolderDecl(jcClassDecl))
+                val getInstanceMethod = makeGetInstanceMethodDecl(jcClassDecl)
+                if (!jcClassDecl.contains(getInstanceMethod)) {
+                    jcClassDecl.defs = jcClassDecl.defs
+                            .prepend(getInstanceMethod)
+                            .prepend(makeInstanceHolderDecl(jcClassDecl))
+                }
             }
             super.visitClassDef(jcClassDecl)
         }
@@ -37,7 +42,7 @@ internal class SingletonProcessor : SingleAnnotationProcessor() {
          *       return UserManager._InstanceHolder._sInstance;
          *   }
          */
-        private fun makeGetInstanceMethodDecl(jcClassDecl: JCClassDecl): JCTree {
+        private fun makeGetInstanceMethodDecl(jcClassDecl: JCClassDecl): JCMethodDecl {
             val body = ListBuffer<JCTree.JCStatement>()
                     .append(treeMaker.Return(treeMaker.Select(treeMaker.Ident(names.fromString("_InstanceHolder")), names.fromString("_sInstance"))))
                     .toList()

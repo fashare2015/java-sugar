@@ -2,6 +2,7 @@ package com.fashare.javasugar.apt.processors.lang
 
 import com.fashare.javasugar.annotation.lang.Getter
 import com.fashare.javasugar.apt.base.SingleAnnotationProcessor
+import com.fashare.javasugar.apt.util.appendIf
 import com.fashare.javasugar.apt.util.contains
 import com.google.auto.service.AutoService
 import com.squareup.javapoet.ClassName
@@ -70,11 +71,10 @@ internal class GetterProcessor : SingleAnnotationProcessor() {
                         .forEach {
                             mFields = mFields.append(it)
 
-                            makeGetterMethodDecl(it).apply {
-                                if (!jcClassDecl.contains(this)) {
-                                    jcClassDecl.defs = jcClassDecl.defs.append(this)
-                                }
-                            }
+                            jcClassDecl.defs = jcClassDecl.defs
+                                    .appendIf(makeGetterMethodDecl(it)) {
+                                        !jcClassDecl.contains(it as JCMethodDecl)
+                                    }
                         }
 
                 // 去掉 abstract
