@@ -27,9 +27,11 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
 
     private var mFields: List<JCVariableDecl> = List.nil()
 
-    private val shouldReturnThis = true
+    private var returnThis = true
 
     override fun translator(curElement: TypeElement, curTree: JCTree, rootTree: JCCompilationUnit) {
+        returnThis = curElement.getAnnotation(mAnnotation).returnThis
+
         curTree.accept(MyTreeTranslator(curElement.simpleName as Name))
 
         try {
@@ -48,10 +50,13 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
                     mFields.forEach {
                         this.addMethod(MethodSpec.methodBuilder(getNewMethodName(it.name).toString())
                                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-//                                .returns(ClassName.get(it.sym.asType()))
-                                .returns(Void.TYPE)
+                                .apply {
+                                    if(returnThis)
+                                        this.returns(ClassName.get(curElement.asType()))
+                                    else
+                                        this.returns(Void.TYPE)
+                                }
                                 .addParameter(ClassName.get(it.sym.asType()), it.name.toString())
-//                .addStatement("\$T.out.println(\$S)", System::class.java, "Hello, JavaPoet!")
                                 .build()
                         )
                     }
@@ -95,7 +100,7 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
                             treeMaker.Ident(jcVariableDecl.name)
                     )))
                     .apply {
-                        if (shouldReturnThis) {
+                        if (returnThis) {
                             this.append(treeMaker.Return(treeMaker.Ident(names._this)))
                         }
                     }
@@ -105,7 +110,7 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
             return treeMaker.MethodDef(
                     treeMaker.Modifiers(Flags.PUBLIC.toLong()),
                     getNewMethodName(jcVariableDecl.getName()),
-                    if (shouldReturnThis) {
+                    if (returnThis) {
                         treeMaker.Ident(jcClassDecl.name)
                     } else {
                         treeMaker.TypeIdent(TypeTag.VOID)

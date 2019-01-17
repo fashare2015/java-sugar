@@ -1,14 +1,14 @@
 package com.fashare.javasugar.test_java.designpattern;
 
+import com.fashare.javasugar.annotation.designpattern.Singletons;
 import com.fashare.javasugar.test_java.lang.User;
 import com.fashare.javasugar.test_java.util.AssertUtil;
-import com.fashare.javasugar.annotation.designpattern.Singletons;
 
 import org.junit.Test;
 
+import static com.fashare.javasugar.test_java.designpattern.UserManager.NoAnnotationManager;
+import static com.fashare.javasugar.test_java.designpattern.UserManager.PhoneManager;
 import static org.junit.Assert.assertEquals;
-import static com.fashare.javasugar.test_java.designpattern.UserManager.*;
-import static org.junit.Assert.assertNull;
 
 /**
  * Created by apple on 2019/1/16.
@@ -37,10 +37,10 @@ public class TestSingleton {
         assertEquals(phone.getOs(), "Android");
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void inner_getter_not_exist() {
         AssertUtil.assertMethodExist(false, NoAnnotationManager.class, "getInstance");
 
-        assertNull(Singletons.get(NoAnnotationManager.class));
+        Singletons.get(NoAnnotationManager.class);
     }
 }

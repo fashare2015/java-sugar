@@ -15,7 +15,8 @@ public class Singletons {
             }
         } catch (Exception ignored) {
         }
-        return null;
+//        return null;
+        throw new IllegalArgumentException(singletonClazz.getSimpleName() + ".getInstance() not found");
     }
 
     private static <T> Method getMethod(Class<T> singletonClazz, String methodName) {

@@ -1,7 +1,8 @@
 package com.fashare.javasugar.test_java.designpattern;
 
-import com.fashare.javasugar.test_java.lang.User;
 import com.fashare.javasugar.annotation.designpattern.Singleton;
+import com.fashare.javasugar.annotation.lang.Instances;
+import com.fashare.javasugar.test_java.lang.User;
 
 /**
  * Created by apple on 2019/1/16.
@@ -9,11 +10,11 @@ import com.fashare.javasugar.annotation.designpattern.Singleton;
 
 @Singleton
 class UserManager {
-    User mUser = new User();
+    User mUser = Instances.get(User.class);
 
     @Singleton
     static class PhoneManager {
-        User.Phone mPhone = new User.Phone();
+        User.Phone mPhone = Instances.get(User.Phone.class);
     }
 
     static class NoAnnotationManager {
