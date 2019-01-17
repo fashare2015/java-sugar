@@ -30,13 +30,4 @@ public abstract class User implements User$$IGetter, User$$ISetter {
     public static class NoAnnotation {
         private String name = "aaa";
     }
-
-    // 测试生成的类 User$$IGetter 不会和内部类解糖后命名冲突
-    public interface IGetter {
-        String getName();
-    }
-
-    public interface ISetter {
-        String getName();
-    }
 }

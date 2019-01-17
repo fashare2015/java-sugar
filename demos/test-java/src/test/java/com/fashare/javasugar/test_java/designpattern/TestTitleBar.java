@@ -1,36 +1,38 @@
 package com.fashare.javasugar.test_java.designpattern;
 
+import com.fashare.javasugar.annotation.lang.Instances;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class TestTitleBar {
 
-    boolean onBackClickCalled;
-    TitleBar titleBar = new TitleBar();
-    TitleBar.OnClickListener onClickListener = new TitleBar.OnClickListener() {
+    private boolean onBackClickCalled;
+    private TitleBar titleBar = Instances.get(TitleBar.class);
+    private TitleBar.OnClickListener onClickListener = new TitleBar.OnClickListener() {
         @Override
-        public void onBackClick(TitleBar self) {
+        public void onClick(TitleBar self) {
             onBackClickCalled = true;
         }
     };
 
     @Test
     public void register_and_notify() {
-        titleBar.mOnClickListeners.clear();
-        titleBar.mOnClickListeners.add(onClickListener);
+        titleBar._mObserverList.clear();
+        titleBar._mObserverList.add(onClickListener);
 
         onBackClickCalled = false;
-        titleBar.mOnClickListeners.asNotifier().onBackClick(titleBar);
+        titleBar._mObserverList.asNotifier().onClick(titleBar);
         assertEquals(onBackClickCalled, true);
     }
 
     @Test
     public void unRegister_and_notify() {
-        titleBar.mOnClickListeners.clear();
+        titleBar._mObserverList.clear();
 
         onBackClickCalled = false;
-        titleBar.mOnClickListeners.asNotifier().onBackClick(titleBar);
+        titleBar._mObserverList.asNotifier().onClick(titleBar);
         assertEquals(onBackClickCalled, false);
     }
 }

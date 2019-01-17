@@ -19,7 +19,7 @@ public interface ISubject<T> {
 
     T asNotifier();
 
-    abstract class Stub<T> implements ISubject<T> {
+    class Stub<T> implements ISubject<T> {
         protected final ArrayList<T> mObservers = new ArrayList<>();
         private static Map<Class<?>, ?> mNotifierCache = new HashMap<>();
 

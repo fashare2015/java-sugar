@@ -24,8 +24,9 @@ internal class SubjectProcessor : SingleAnnotationProcessor() {
     inner class MyTreeTranslator(private val rootClazzName: Name) : TreeTranslator() {
 
         override fun visitTopLevel(cu: JCTree.JCCompilationUnit) {
-            cu.defs = cu.defs.prepend(
-                    treeMaker.Import(treeMaker.Select(treeMaker.Ident(names.fromString("java.util")), names.fromString("*")), false))
+            cu.defs = cu.defs
+                    .prepend(treeMaker.Import(treeMaker.Select(treeMaker.Ident(names.fromString("java.util")), names.fromString("*")), false))
+                    .prepend(treeMaker.Import(treeMaker.Select(treeMaker.Ident(names.fromString("com.fashare.javasugar.annotation.designpattern")), names.fromString("ISubject")), false))
             super.visitTopLevel(cu)
         }
 
@@ -37,7 +38,7 @@ internal class SubjectProcessor : SingleAnnotationProcessor() {
                 makeObserversFieldDecl(jcClassDecl)
 
                 // implement Subject.Stub
-                implementSubjectStub(jcClassDecl)
+//                implementSubjectStub(jcClassDecl)
 
                 // 去掉 abstract
                 jcClassDecl.mods.flags = jcClassDecl.mods.flags and (Flags.ABSTRACT.toLong().inv())
@@ -47,10 +48,15 @@ internal class SubjectProcessor : SingleAnnotationProcessor() {
 
         private fun makeObserversFieldDecl(jcClassDecl: JCClassDecl) {
             val observersField = treeMaker.VarDef(
-                    treeMaker.Modifiers(Flags.PRIVATE.toLong()),
+                    treeMaker.Modifiers(Flags.PUBLIC.toLong()),
                     names.fromString("_mObserverList"),
-                    treeMaker.Ident(names.fromString("List")),
-                    treeMaker.NewClass(null, List.nil(), treeMaker.Ident(names.fromString("ArrayList")), List.nil(), null))
+                    treeMaker.TypeApply(treeMaker.Ident(names.fromString("ISubject")),
+                            List.of(treeMaker.Ident(names.fromString("OnClickListener")))),
+                    treeMaker.NewClass(null, List.nil(),
+                            treeMaker.TypeApply(treeMaker.Select(treeMaker.Ident(names.fromString("ISubject")), names.fromString("Stub")),
+                                    List.of(treeMaker.Ident(names.fromString("OnClickListener")))),
+                            List.nil(),
+                            treeMaker.AnonymousClassDef(treeMaker.Modifiers(0), List.nil())))
 
             jcClassDecl.defs = jcClassDecl.defs.prepend(observersField)
         }

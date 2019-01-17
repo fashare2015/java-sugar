@@ -7,9 +7,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.TYPE)
-public @interface Subject {
-    /**
-     * class of observer
-     */
-    Observer[] value();
+public @interface Observer {
+    Class<?> value();
+
+    String name() default "observer";
 }
