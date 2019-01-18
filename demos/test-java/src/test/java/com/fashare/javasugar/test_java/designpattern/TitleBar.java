@@ -3,6 +3,8 @@ package com.fashare.javasugar.test_java.designpattern;
 import com.fashare.javasugar.annotation.designpattern.Observer;
 import com.fashare.javasugar.annotation.designpattern.Subject;
 
+import java.util.concurrent.Callable;
+
 /**
  * Created by apple on 2019/1/16.
  */
@@ -11,6 +13,7 @@ import com.fashare.javasugar.annotation.designpattern.Subject;
         @Observer(value = TitleBar.OnClickListener.class, name = "Click"),
         @Observer(value = TitleBar.OnScrollListener.class, name = "Scroll"),
         @Observer(value = Runnable.class, name = "Runnable"),
+        @Observer(value = Callable.class, name = "Callable"),
 })
 abstract class TitleBar implements TitleBar$$ISubject {
     public interface OnClickListener {

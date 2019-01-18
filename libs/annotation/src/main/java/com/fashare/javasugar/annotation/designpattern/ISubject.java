@@ -11,9 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public interface ISubject<T> {
-    void add(T observer);
+    void add(Object observer);
 
-    void remove(T observer);
+    void remove(Object observer);
 
     void clear();
 
@@ -23,18 +23,23 @@ public interface ISubject<T> {
         protected final ArrayList<T> mObservers = new ArrayList<>();
         private Map<Class<?>, ?> mNotifierCache = new HashMap<>();
 
-        public void add(T observer) {
-            if (!mObservers.contains(observer)) {
-                mObservers.add(observer);
+        @SuppressWarnings({"unchecked"})
+        @Override
+        public void add(Object observer) {
+            if (!mObservers.contains((T) observer)) {
+                mObservers.add((T) observer);
             }
         }
 
-        public void remove(T observer) {
-            if (mObservers.contains(observer)) {
+        @SuppressWarnings({"unchecked"})
+        @Override
+        public void remove(Object observer) {
+            if (mObservers.contains((T) observer)) {
                 mObservers.remove(observer);
             }
         }
 
+        @Override
         public void clear() {
             mObservers.clear();
         }

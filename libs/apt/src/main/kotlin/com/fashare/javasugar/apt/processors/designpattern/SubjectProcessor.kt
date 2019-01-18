@@ -45,10 +45,32 @@ internal class SubjectProcessor : SingleAnnotationProcessor() {
         val curISubject = TypeSpec.interfaceBuilder("${curElement.qualifiedName.substring(packageName.length + 1).replace(".", "$$")}\$\$ISubject")
                 .addModifiers(Modifier.PUBLIC)
                 .apply {
+                    val typeT = TypeVariableName.get("T")
+                    val typeISubject = ClassName.get(ISubject::class.java)
+
                     mObservers.forEach { observer ->
+                        val typeFull: Type.ClassType = (observer.getValue() as Type.ClassType)  // Observer
+                                .let { it.tsym.type as Type.ClassType }     // Observer<T>
+                        val typeObserver = ClassName.get(observer.getValue()) as ClassName
+
+                        val hasTypeParam = typeFull.typeArguments.isNotEmpty()
+                        val typeReturn = if (hasTypeParam) {  // ISubject<Observer<? super T>>  PECS
+//                            val typeSuperT = WildcardTypeName.supertypeOf(typeT)
+//                            val typeObserverSuperT = ParameterizedTypeName.get(typeObserver, typeSuperT)
+//                            ParameterizedTypeName.get(typeISubject, typeObserverSuperT)
+
+                            val typeObserverT = ParameterizedTypeName.get(typeObserver, typeT)
+                            ParameterizedTypeName.get(typeISubject, typeObserverT)
+                        } else {    // ISubject<Observer>
+                            ParameterizedTypeName.get(typeISubject, typeObserver)
+                        }
                         this.addMethod(MethodSpec.methodBuilder("${observer.name}Subject".asGetter())
                                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                .returns(ParameterizedTypeName.get(ClassName.get(ISubject::class.java), ClassName.get(observer.getValue())))
+                                .apply {
+                                    if (hasTypeParam)
+                                        this.addTypeVariable(typeT)
+                                }
+                                .returns(typeReturn)
                                 .build()
                         )
                     }
