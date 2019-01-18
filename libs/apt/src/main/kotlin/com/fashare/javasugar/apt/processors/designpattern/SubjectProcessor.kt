@@ -45,21 +45,19 @@ internal class SubjectProcessor : SingleAnnotationProcessor() {
         val curISubject = TypeSpec.interfaceBuilder("${curElement.qualifiedName.substring(packageName.length + 1).replace(".", "$$")}\$\$ISubject")
                 .addModifiers(Modifier.PUBLIC)
                 .apply {
-                    val typeT = TypeVariableName.get("T")
                     val typeISubject = ClassName.get(ISubject::class.java)
 
                     mObservers.forEach { observer ->
                         val typeFull: Type.ClassType = (observer.getValue() as Type.ClassType)  // Observer
                                 .let { it.tsym.type as Type.ClassType }     // Observer<T>
                         val typeObserver = ClassName.get(observer.getValue()) as ClassName
+                        val typeTs = typeFull.typeArguments.indices.map {
+                            TypeVariableName.get("${typeFull.typeArguments[it]}")
+                        }
 
                         val hasTypeParam = typeFull.typeArguments.isNotEmpty()
-                        val typeReturn = if (hasTypeParam) {  // ISubject<Observer<? super T>>  PECS
-//                            val typeSuperT = WildcardTypeName.supertypeOf(typeT)
-//                            val typeObserverSuperT = ParameterizedTypeName.get(typeObserver, typeSuperT)
-//                            ParameterizedTypeName.get(typeISubject, typeObserverSuperT)
-
-                            val typeObserverT = ParameterizedTypeName.get(typeObserver, typeT)
+                        val typeReturn = if (hasTypeParam) {  // ISubject<Observer<T, ..>>
+                            val typeObserverT = ParameterizedTypeName.get(typeObserver, *typeTs.toTypedArray())
                             ParameterizedTypeName.get(typeISubject, typeObserverT)
                         } else {    // ISubject<Observer>
                             ParameterizedTypeName.get(typeISubject, typeObserver)
@@ -68,7 +66,7 @@ internal class SubjectProcessor : SingleAnnotationProcessor() {
                                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                                 .apply {
                                     if (hasTypeParam)
-                                        this.addTypeVariable(typeT)
+                                        this.addTypeVariables(typeTs)
                                 }
                                 .returns(typeReturn)
                                 .build()
