@@ -44,7 +44,7 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
     private fun getJavaFile(curElement: TypeElement): JavaFile {
         val packageName = rootTree?.packageName?.toString() ?: ""
 
-        val curIGetter = TypeSpec.interfaceBuilder("${curElement.qualifiedName.substring(packageName.length + 1).replace(".", "$$")}\$\$ISetter")
+        val curISetter = TypeSpec.interfaceBuilder("${curElement.qualifiedName.substring(packageName.length + 1).replace(".", "$$")}\$\$ISetter")
                 .addModifiers(Modifier.PUBLIC)
                 .apply {
                     mFields.forEach {
@@ -63,7 +63,7 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
                 }
                 .build()
 
-        return JavaFile.builder(packageName, curIGetter)
+        return JavaFile.builder(packageName, curISetter)
                 .build()
     }
 

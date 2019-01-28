@@ -1,5 +1,6 @@
 package com.fashare.javasugar.test_java.lang;
 
+import com.fashare.javasugar.annotation.designpattern.Builder;
 import com.fashare.javasugar.annotation.lang.Getter;
 import com.fashare.javasugar.annotation.lang.Setter;
 
@@ -12,6 +13,7 @@ import java.util.Map;
  * Created by apple on 2019/1/15.
  */
 
+@Builder
 @Getter
 @Setter
 public abstract class User implements User$$IGetter, User$$ISetter {
@@ -20,6 +22,7 @@ public abstract class User implements User$$IGetter, User$$ISetter {
     private List<String> phoneNums = Arrays.asList("10010", "10086");
     private Map<String, String> map = new HashMap<>();
 
+    @Builder
     @Getter
     @Setter(returnThis = false)
     public static abstract class Phone implements User$$Phone$$IGetter, User$$Phone$$ISetter {
