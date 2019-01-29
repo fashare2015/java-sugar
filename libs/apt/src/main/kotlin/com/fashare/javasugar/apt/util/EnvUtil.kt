@@ -1,6 +1,7 @@
 package com.fashare.javasugar.apt.util
 
 import com.sun.source.util.Trees
+import com.sun.tools.javac.code.Types
 import com.sun.tools.javac.processing.JavacProcessingEnvironment
 import com.sun.tools.javac.tree.TreeMaker
 import com.sun.tools.javac.util.Names
@@ -24,6 +25,7 @@ internal object EnvUtil {
     lateinit var trees: Trees
     lateinit var treeMaker: TreeMaker
     lateinit var names: Names
+    lateinit var types: Types
 
     fun init(env: ProcessingEnvironment) {
         if (EnvUtil.env != null) {
@@ -39,5 +41,6 @@ internal object EnvUtil {
         val context = (env as JavacProcessingEnvironment).context
         treeMaker = TreeMaker.instance(context)
         names = Names.instance(context)
+        types = Types.instance(context)
     }
 }

@@ -1,8 +1,20 @@
 package com.fashare.javasugar.apt.util
 
+import com.fashare.javasugar.apt.util.EnvUtil.types
+import com.sun.tools.javac.code.Flags
 import com.sun.tools.javac.tree.JCTree.JCClassDecl
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl
 import com.sun.tools.javac.util.List
+
+fun JCClassDecl.removeAbstractIfNeed() {
+    if (this.sym == null)
+        return
+    val undef = types.firstUnimplementedAbstract(this.sym)
+    if (undef == null) {
+        // 去掉 abstract
+        this.mods.flags = this.mods.flags and (Flags.ABSTRACT.toLong().inv())
+    }
+}
 
 fun JCClassDecl.contains(method: JCMethodDecl): Boolean {
     this.defs.forEach {

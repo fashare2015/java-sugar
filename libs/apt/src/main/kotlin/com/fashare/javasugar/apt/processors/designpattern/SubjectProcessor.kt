@@ -99,7 +99,7 @@ internal class SubjectProcessor : SingleAnnotationProcessor() {
 //                implementSubjectStub(jcClassDecl)
 
                 // 去掉 abstract
-                jcClassDecl.mods.flags = jcClassDecl.mods.flags and (Flags.ABSTRACT.toLong().inv())
+//                jcClassDecl.mods.flags = jcClassDecl.mods.flags and (Flags.ABSTRACT.toLong().inv())
             }
             super.visitClassDef(jcClassDecl)
         }

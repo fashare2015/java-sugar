@@ -67,4 +67,17 @@ public class TestSetter {
         assertNotEquals(user.getId(), 50);
         assertEquals(user.getId(), 999);
     }
+
+    // User3
+    @Test
+    public void User3_setter_exist() {
+        AssertUtil.assertMethodExist(true, User3.class, "setName", String.class);
+        AssertUtil.assertMethodExist(true, User3.class, "setId", int.class);
+
+        User3 user = Instances.get(User4.class)
+                .setName("google")
+                .setId(50);
+
+        assertEquals(user.getId(), 50);
+    }
 }

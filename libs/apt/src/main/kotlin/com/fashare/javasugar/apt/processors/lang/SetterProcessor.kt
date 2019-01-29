@@ -84,9 +84,6 @@ internal class SetterProcessor : SingleAnnotationProcessor() {
                                         !jcClassDecl.contains(it as JCMethodDecl)
                                     }
                         }
-
-                // 去掉 abstract
-                jcClassDecl.mods.flags = jcClassDecl.mods.flags and (Flags.ABSTRACT.toLong().inv())
             }
             super.visitClassDef(jcClassDecl)
         }
