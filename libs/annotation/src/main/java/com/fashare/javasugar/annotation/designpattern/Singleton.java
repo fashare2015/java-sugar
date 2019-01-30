@@ -8,4 +8,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.TYPE)
 public @interface Singleton {
+
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.CONSTRUCTOR)
+    @interface Main {
+    }
 }
