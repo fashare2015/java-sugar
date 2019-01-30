@@ -47,6 +47,7 @@ fun <T> List<T>.appendIf(item: T, validate: (item: T) -> Boolean): List<T> {
     return result
 }
 
+@Suppress("unused")
 fun <T> List<T>.prependIf(item: T, validate: (item: T) -> Boolean): List<T> {
     var result = this
     if (validate.invoke(item)) {

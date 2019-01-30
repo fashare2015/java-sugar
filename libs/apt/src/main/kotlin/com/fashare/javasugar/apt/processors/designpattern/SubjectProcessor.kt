@@ -11,9 +11,9 @@ import com.google.auto.service.AutoService
 import com.squareup.javapoet.*
 import com.sun.tools.javac.code.Flags
 import com.sun.tools.javac.code.Type
-import com.sun.tools.javac.code.TypeTag
 import com.sun.tools.javac.tree.JCTree
-import com.sun.tools.javac.tree.JCTree.*
+import com.sun.tools.javac.tree.JCTree.JCClassDecl
+import com.sun.tools.javac.tree.JCTree.JCStatement
 import com.sun.tools.javac.tree.TreeTranslator
 import com.sun.tools.javac.util.List
 import com.sun.tools.javac.util.ListBuffer
@@ -22,7 +22,7 @@ import javax.annotation.processing.Processor
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 
-
+@Suppress("unused")
 @AutoService(Processor::class)
 internal class SubjectProcessor : SingleAnnotationProcessor() {
     override val mAnnotation = Subject::class.java
@@ -92,14 +92,7 @@ internal class SubjectProcessor : SingleAnnotationProcessor() {
             if (jcClassDecl.name == rootClazzName) {
                 treeMaker.at(jcClassDecl.pos)
 
-                // 添加 private List _mObserverList = new ArrayList();
                 makeISubjectFieldAndGetter(jcClassDecl)
-
-                // implement Subject.Stub
-//                implementSubjectStub(jcClassDecl)
-
-                // 去掉 abstract
-//                jcClassDecl.mods.flags = jcClassDecl.mods.flags and (Flags.ABSTRACT.toLong().inv())
             }
             super.visitClassDef(jcClassDecl)
         }
@@ -137,71 +130,6 @@ internal class SubjectProcessor : SingleAnnotationProcessor() {
 
                 jcClassDecl.defs = jcClassDecl.defs.prepend(iSubjectGetter)
             }
-        }
-
-        // 是否有更简洁的方法
-        private fun implementSubjectStub(jcClassDecl: JCClassDecl) {
-            // void add(Object observer) {}
-            val methodAdd = method("add", "Object", "observer") {
-                treeMaker.Block(0, List.of(invoke("_mObserverList", "add", "observer")))
-            }
-
-            // void remove(Object observer) {}
-            val methodRemove = method("remove", "Object", "observer") {
-                treeMaker.Block(0, List.of(invoke("_mObserverList", "remove", "observer")))
-            }
-
-            // void notify(Object event) {}
-            val methodNotify = method("notify", "Object", "event") {
-                val forEachLoop = treeMaker.ForeachLoop(
-                        treeMaker.VarDef(treeMaker.Modifiers(0),
-                                names.fromString("item"),
-                                treeMaker.Ident(names.fromString("Object"))
-                                , null),
-                        treeMaker.Ident(names.fromString("_mObserverList")),
-                        treeMaker.Block(0, List.of(invoke("item", "Listener", "onEvent", "event")))  // TODO 类型不写死 Listener
-                )
-                treeMaker.Block(0, List.of(forEachLoop))
-            }
-
-            jcClassDecl.defs = jcClassDecl.defs
-                    .append(methodAdd)
-                    .append(methodRemove)
-                    .append(methodNotify)
-        }
-
-        fun method(methodName: String, paramType: String, param: String, body: () -> JCTree.JCBlock): JCMethodDecl {
-            return treeMaker.MethodDef(
-                    treeMaker.Modifiers(Flags.PUBLIC.toLong()),
-                    names.fromString(methodName),
-                    treeMaker.TypeIdent(TypeTag.VOID),
-                    List.nil(),
-                    List.of(treeMaker.VarDef(treeMaker.Modifiers(Flags.PARAMETER),
-                            names.fromString(param),
-                            treeMaker.Ident(names.fromString(paramType)),
-                            null)
-                    ),
-                    List.nil(),
-                    body.invoke(), null)
-        }
-
-        fun invoke(field: String, methodName: String, param: String): JCExpressionStatement {
-            val _field = treeMaker.Ident(names.fromString(field))
-            return treeMaker.Exec(treeMaker.Apply(null,
-                    treeMaker.Select(_field, names.fromString(methodName)),
-                    List.of(treeMaker.Ident(names.fromString(param)))
-            ))
-        }
-
-        fun invoke(field: String, castTo: String, methodName: String, param: String): JCExpressionStatement {
-            val _field = treeMaker.Parens(treeMaker.TypeCast(
-                    treeMaker.Ident(names.fromString(castTo)),
-                    treeMaker.Ident(names.fromString(field))
-            ))
-            return treeMaker.Exec(treeMaker.Apply(null,
-                    treeMaker.Select(_field, names.fromString(methodName)),
-                    List.of(treeMaker.Ident(names.fromString(param)))
-            ))
         }
     }
 }

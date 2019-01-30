@@ -18,6 +18,7 @@ import javax.annotation.processing.Processor
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 
+@Suppress("unused")
 @AutoService(Processor::class)
 internal class BuilderProcessor : SingleAnnotationProcessor() {
     override val mAnnotation = Builder::class.java
@@ -36,8 +37,8 @@ internal class BuilderProcessor : SingleAnnotationProcessor() {
 
     private fun getJavaFile(curElement: TypeElement): JavaFile {
         val packageName = rootTree?.packageName?.toString() ?: ""
-        val rawTargetName = "${curElement.qualifiedName.substring(packageName.length + 1)}"
-        val targetName = "${curElement.qualifiedName.substring(packageName.length + 1).replace(".", "$$")}"
+        val rawTargetName = curElement.qualifiedName.substring(packageName.length + 1)
+        val targetName = rawTargetName.replace(".", "$$")
         val builderName = "$targetName\$\$Builder"
 
         val curBuilder = TypeSpec.classBuilder(builderName)
@@ -64,6 +65,7 @@ internal class BuilderProcessor : SingleAnnotationProcessor() {
                         )
                     }
 
+                    @Suppress("UnnecessaryVariable")
                     val typeUser = rawTargetName
                     val varUser = targetName.lowerFirst()
                     this.addMethod(MethodSpec.methodBuilder("build")

@@ -19,13 +19,17 @@ public interface ISubject<T> {
 
     T asNotifier();
 
+    @SuppressWarnings("unused")
     class Stub<T> implements ISubject<T> {
+        @SuppressWarnings("WeakerAccess")
         protected final ArrayList<T> mObservers = new ArrayList<>();
+        @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
         private Map<Class<?>, ?> mNotifierCache = new HashMap<>();
 
         @SuppressWarnings({"unchecked"})
         @Override
         public void add(Object observer) {
+            //noinspection RedundantCast
             if (!mObservers.contains((T) observer)) {
                 mObservers.add((T) observer);
             }
@@ -34,6 +38,7 @@ public interface ISubject<T> {
         @SuppressWarnings({"unchecked"})
         @Override
         public void remove(Object observer) {
+            //noinspection RedundantCast
             if (mObservers.contains((T) observer)) {
                 mObservers.remove(observer);
             }
@@ -52,6 +57,7 @@ public interface ISubject<T> {
             if (mNotifierCache.get(clazz) != null) {
                 return (T) mNotifierCache.get(clazz);
             }
+            //noinspection Convert2Lambda
             T notifier = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new InvocationHandler() {
                 @Override
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -74,6 +80,7 @@ public interface ISubject<T> {
         /**
          * copy from retrofit.Utils
          */
+        @SuppressWarnings("SameParameterValue")
         private static Type getParameterUpperBound(int index, ParameterizedType type) {
             Type[] types = type.getActualTypeArguments();
             if (index < 0 || index >= types.length) {

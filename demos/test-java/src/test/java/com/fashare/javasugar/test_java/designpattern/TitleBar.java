@@ -25,6 +25,7 @@ abstract class TitleBar implements TitleBar$$ISubject {
         void onClick(TitleBar self);
     }
 
+    @SuppressWarnings("unused")
     public interface OnScrollListener {
         void onScrolled(TitleBar self, int dy);
 

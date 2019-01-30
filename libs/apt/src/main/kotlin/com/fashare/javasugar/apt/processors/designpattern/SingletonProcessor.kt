@@ -15,6 +15,7 @@ import com.sun.tools.javac.util.Name
 import javax.annotation.processing.Processor
 import javax.lang.model.element.TypeElement
 
+@Suppress("unused")
 @AutoService(Processor::class)
 internal class SingletonProcessor : SingleAnnotationProcessor() {
     override val mAnnotation = Singleton::class.java

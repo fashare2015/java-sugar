@@ -23,6 +23,7 @@ import javax.annotation.processing.Processor
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 
+@Suppress("unused")
 @AutoService(Processor::class)
 internal class SetterProcessor : SingleAnnotationProcessor() {
     override val mAnnotation = Setter::class.java

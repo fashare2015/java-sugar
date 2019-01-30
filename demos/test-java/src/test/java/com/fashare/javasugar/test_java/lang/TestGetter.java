@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -26,7 +27,7 @@ public class TestGetter {
         User user = Instances.get(User.class);
         assertEquals(user.getName(), "fashare");
         assertEquals(user.getId(), 5);
-        assertEquals(user.getPhoneNums().toArray(new String[0]),
+        assertArrayEquals(user.getPhoneNums().toArray(new String[0]),
                 Arrays.asList("10010", "10086").toArray(new String[0]));
     }
 

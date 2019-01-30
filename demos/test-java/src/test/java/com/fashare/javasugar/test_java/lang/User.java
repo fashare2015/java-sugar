@@ -13,6 +13,7 @@ import java.util.Map;
  * Created by apple on 2019/1/15.
  */
 
+@SuppressWarnings("unused")
 @Builder
 @Getter
 @Setter

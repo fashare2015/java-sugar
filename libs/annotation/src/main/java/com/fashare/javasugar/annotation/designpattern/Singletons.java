@@ -19,6 +19,7 @@ public class Singletons {
         throw new IllegalArgumentException(singletonClazz.getSimpleName() + ".getInstance() not found");
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static <T> Method getMethod(Class<T> singletonClazz, String methodName) {
         String key = singletonClazz.getCanonicalName() + methodName;
         Method method = sMethodCache.get(key);

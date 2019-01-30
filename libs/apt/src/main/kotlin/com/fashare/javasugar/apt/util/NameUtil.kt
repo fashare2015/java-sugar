@@ -19,8 +19,8 @@ fun String.lowerFirst(): String {
         str
 }
 
+@Suppress("unused")
 fun String.asClass(): String {
-    val str = this
     return this.upperFirst()
 }
 
@@ -28,6 +28,7 @@ fun String.asField(): String {
     return this.lowerFirst()
 }
 
+@Suppress("unused")
 fun String.asMethod(): String {
     return this.lowerFirst()
 }

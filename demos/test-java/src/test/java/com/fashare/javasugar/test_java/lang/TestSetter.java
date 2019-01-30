@@ -5,9 +5,10 @@ import com.fashare.javasugar.test_java.util.AssertUtil;
 
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -27,12 +28,12 @@ public class TestSetter {
         User user = Instances.get(User.class)
                 .setName("google")
                 .setId(50)
-                .setPhoneNums(Arrays.asList("10000"));
+                .setPhoneNums(Collections.singletonList("10000"));
 
         assertEquals(user.getName(), "google");
         assertEquals(user.getId(), 50);
-        assertEquals(user.getPhoneNums().toArray(new String[0]),
-                Arrays.asList("10000").toArray(new String[0]));
+        assertArrayEquals(user.getPhoneNums().toArray(new String[0]),
+                Collections.singletonList("10000").toArray(new String[0]));
     }
 
     @Test

@@ -9,6 +9,7 @@ fun Any.logd(msg: String) {
     EnvUtil.messager.printMessage(Diagnostic.Kind.NOTE, "${this.javaClass.simpleName}: $msg")
 }
 
+@Suppress("unused")
 fun Any.loge(msg: String) {
     EnvUtil.messager.printMessage(Diagnostic.Kind.ERROR, "${this.javaClass.simpleName}: $msg")
 }

@@ -17,6 +17,7 @@ class UserManager {
         User.Phone mPhone = Instances.get(User.Phone.class);
     }
 
+    @SuppressWarnings("unused")
     static class NoAnnotationManager {
         User.NoAnnotation mNoAnnotation = new User.NoAnnotation();
     }

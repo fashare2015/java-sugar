@@ -15,12 +15,7 @@ public class TestSubject {
 
     private String data = "";
     private MyEventBus mEventBus = Singletons.get(MyEventBus.class);
-    private MyEventBus.Listener<String> mListener = new MyEventBus.Listener<String>(){
-        @Override
-        public void onEvent(String event) {
-            data = event;
-        }
-    };
+    private MyEventBus.Listener<String> mListener = event -> data = event;
 
     @Test
     public void register_and_notify() {

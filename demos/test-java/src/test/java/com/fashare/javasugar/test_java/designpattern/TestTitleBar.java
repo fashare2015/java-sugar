@@ -10,12 +10,7 @@ public class TestTitleBar {
 
     private boolean onClickCalled;
     private TitleBar titleBar = Instances.get(TitleBar.class);
-    private TitleBar.OnClickListener onClickListener = new TitleBar.OnClickListener() {
-        @Override
-        public void onClick(TitleBar self) {
-            onClickCalled = true;
-        }
-    };
+    private TitleBar.OnClickListener onClickListener = self -> onClickCalled = true;
 
     @Test
     public void register_and_notify() {

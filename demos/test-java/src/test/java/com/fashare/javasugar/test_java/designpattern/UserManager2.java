@@ -17,6 +17,7 @@ class UserManager2 {
     /**
      * test case: getInstance() 已存在
      */
+    @SuppressWarnings("unused")
     public static UserManager2 getInstance() {
         return sInstance;
     }

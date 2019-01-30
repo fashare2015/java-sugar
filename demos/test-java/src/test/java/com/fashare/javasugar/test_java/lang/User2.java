@@ -6,10 +6,12 @@ import com.fashare.javasugar.annotation.lang.Setter;
 /**
  * 测试异常情况
  */
+@SuppressWarnings("unused")
 @Getter
 @Setter
 public abstract class User2 implements User2$$IGetter, User2$$ISetter {
     private String name = "fashare";
+    @SuppressWarnings("FieldCanBeLocal")
     private int id = 5;
 
     /**
